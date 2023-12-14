@@ -11,5 +11,5 @@ login_manager.init_app(app)
 
 
 @login_manager.user_loader
-def load_user(conn, cursor, user_id):
-    return User.get(conn, cursor, user_id)
+def load_user(user_id):
+    return User.get(user_id)

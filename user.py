@@ -22,6 +22,7 @@ class User:
         self.email = email
         self.is_active = True
 
+    @database_access
     def add_user_to_db(self, conn, cursor):
         table_query = """
             INSERT INTO Account (username, password, name, surname, email)
@@ -48,7 +49,7 @@ class User:
         try:
             cursor.execute(table_query, (username, password))
             result = cursor.fetchall()[0][0]
-            load_user(conn, cursor, result)
+            load_user(result)
             return True
         except IndexError:
             conn.rollback()
@@ -63,6 +64,7 @@ class User:
         print(f"Email: {self.email}")
 
     @staticmethod
+    @database_access
     def get(conn, cursor, user_id):
         table_query = """
             SELECT *
@@ -79,10 +81,10 @@ class User:
                 temp_user.password,
                 temp_user.name,
                 temp_user.surname,
-                temp_user.email
+                temp_user.email,
+                temp_user.is_active
             ) = result
             temp_user.is_authenticated = True
-            temp_user.is_active = True
             temp_user.is_anonymous = False
             return temp_user
         except IndexError:
