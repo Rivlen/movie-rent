@@ -56,14 +56,6 @@ class User:
             conn.rollback()
         return False
 
-    def print_user_data(self):
-        print(f"User ID: {self.user_id}")
-        print(f"Username: {self.username}")
-        print(f"Password: {self.password}")
-        print(f"Name: {self.name}")
-        print(f"Surname: {self.surname}")
-        print(f"Email: {self.email}")
-
     @staticmethod
     @database_access
     def get(conn, cursor, user_id):
