@@ -1,26 +1,42 @@
 import psycopg2
 
 
-class Database:
-    def __init__(self, host, database, user, password):
-        self.host = host
-        self.database = database
-        self.user = user
-        self.password = password
+def create_conn_cursor(host, database, user, password):
+    try:
+        conn = psycopg2.connect(
+            host=host,
+            database=database,
+            user=user,
+            password=password
+        )
+        cursor = conn.cursor()
+        return conn, cursor
+    except psycopg2.OperationalError as err:
+        raise err
 
-    def create_conn_cursor(self):
+
+def close_conn_cursor(conn, cursor):
+    cursor.close()
+    conn.close()
+
+
+def database_access(func):
+    def wrapper(*args, **kwargs):
+        db = (
+            "localhost",
+            "movierentdb",
+            "postgres",
+            "password"
+        )
+        conn, cursor = create_conn_cursor(*db)
         try:
-            self.conn = psycopg2.connect(
-                host=self.host,
-                database=self.database,
-                user=self.user,
-                password=self.password
-            )
-            self.cursor = self.conn.cursor()
-            return self.conn, self.cursor
-        except psycopg2.OperationalError as err:
-            raise err
+            result = func(conn, cursor, *args, **kwargs)
+            conn.commit()
+            return result
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            close_conn_cursor(conn, cursor)
 
-    def close_conn_cursor(self):
-        self.cursor.close()
-        self.conn.close()
+    return wrapper
