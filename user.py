@@ -1,3 +1,4 @@
+import flask_login
 from psycopg2 import errors
 from database import database_access
 
@@ -93,3 +94,7 @@ class User:
 
     def get_id(self):
         return str(self.user_id)
+
+    @staticmethod
+    def logout():
+        flask_login.logout_user()

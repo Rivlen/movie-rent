@@ -1,11 +1,9 @@
-import flask_login
-from flask import Flask, render_template
-
-app = Flask(__name__)
+from website import *
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home_page():
-    if flask_login.current_user():
-        return render_template('home_page.html')
-    return render_template('home_page.html')
+    message = ''
+    if flask_login.current_user.is_authenticated:
+        message = 'User id: ', flask_login.get_id()
+    return render_template('home_page.html', message=message)
